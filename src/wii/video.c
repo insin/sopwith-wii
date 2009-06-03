@@ -155,7 +155,7 @@ void Vid_Update()
 	else 
 		SDL_BlitSurface(screenbuf, NULL, screen, NULL);
 
-	SDL_UpdateRect(screen, 0, 0, screen->w, screen->h);
+	SDL_Flip(screen);
 
 	SDL_LockSurface(screenbuf);
 }
