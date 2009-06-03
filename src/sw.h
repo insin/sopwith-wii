@@ -58,7 +58,15 @@
 
 #endif
 
+#ifdef HW_RVL
+
+#define SCR_HGHT        240             /*  Screen Height                   */
+
+#else
+
 #define SCR_HGHT        200             /*  Screen Height                   */
+
+#endif
 
 #define SCR_CENTR       ((SCR_WDTH / 2) - 8) /*  Centre column of screen */
 #define SCR_SEGM        0xB800          /*  Screen Video segment            */
