@@ -126,7 +126,7 @@ jmp_buf envrestart;		/* Restart environment for restart  */
 					/*  long jump.                      */
 
 
-int main(int argc, char *argv[])
+int SDL_main(int argc, char *argv[])
 {
 	int nexttic;
 
