@@ -170,7 +170,7 @@ BOOL movemult(OBJECTS * obp)
 	return movepln(ob);
 }
 
-#define PROTOHEADER "SDLSOPWITH" VERSION
+#define PROTOHEADER "SDLSOPWITHWii"
 
 static void synchronize()
 {

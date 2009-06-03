@@ -214,7 +214,7 @@ void swsaveconf()
 	}
 
 	fprintf(fs, "# sopwith config file\n");
-	fprintf(fs, "# created by SDL Sopwith " VERSION "\n");
+	fprintf(fs, "# created by SDL Sopwith Wii\n");
 	fprintf(fs, "\n");
 	
 	for (i=0; i<num_confoptions; ++i) {

@@ -70,7 +70,7 @@ void swtitln()
 
 	swcolour(1);
 	swposcur(12+X_OFFSET/8, 8);
-	swputs("(Version " VERSION ")");
+	swputs("(Version Wii)");
 
 	swcolour(3);
 	swposcur(5+X_OFFSET/8, 11);
@@ -95,7 +95,7 @@ void swtitln()
 	swputs("S O P W I T H");
 
 	swposcur(13+X_OFFSET/8, 6);
-	swputs("Version " VERSION);
+	swputs("Wii Version");
 
 	swcolour(3);
 	swposcur(1+X_OFFSET/8, 10);
