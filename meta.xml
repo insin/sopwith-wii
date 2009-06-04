@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>SDL Sopwith</name>
+  <coder>insin</coder>
+  <version>1.7.1-1</version>
+  <release_date>20090604</release_date>
+  <short_description>Classic Shooter</short_description>
+  <long_description>A port of the classic computer game "Sopwith" to run on modern computers, operating systems and game consoles.</long_description>
+</app>
