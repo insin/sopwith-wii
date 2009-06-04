@@ -56,7 +56,7 @@ static SDL_Surface *screen;
 static SDL_Surface *screenbuf = NULL;        // draw into buffer in 2x mode
 static SDL_Joystick *sdl_joystick = NULL;
 static int colors[16];
-static int directional_hats[3] = {SDL_HAT_LEFT, SDL_HAT_RIGHT, SDL_HAT_DOWN};
+static int directional_hats[4] = {SDL_HAT_LEFT, SDL_HAT_RIGHT, SDL_HAT_DOWN, SDL_HAT_UP};
 static Uint8 hat;
 
 static int getcolor(int r, int g, int b)
@@ -346,7 +346,7 @@ static int input_buffer_pop()
 	int c;
 
 	if (input_buffer_head == input_buffer_tail)
-		return 0;
+		return -1;
 
 	c = input_buffer[input_buffer_head++];
 
@@ -399,6 +399,20 @@ static sopkey_t translate_hat(int hat)
 	}
 }
 
+static int hat_to_wii(int hat)
+{
+	switch (hat) {
+	case SDL_HAT_LEFT:
+		return PAD_LEFT;
+	case SDL_HAT_RIGHT:
+		return PAD_RIGHT;
+	case SDL_HAT_DOWN:
+		return PAD_DOWN;
+	case SDL_HAT_UP:
+		return PAD_UP;
+	}
+}
+
 static void getevents()
 {
 	SDL_Event event;
@@ -445,6 +459,11 @@ static void getevents()
 					{
 						keysdown[translated] |= 3;
 					}
+				}
+
+				if ((hat & directional_hats[i]) != 0)
+				{
+					input_buffer_push(hat_to_wii(directional_hats[i]));
 				}
 			}
 			break;

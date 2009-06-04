@@ -157,9 +157,11 @@ int swgetc()
 {
 	int i;
 
-	while(!(i = Vid_GetKey())) {
-
-		// sdh 15/11/2001: dont thrash the processor while 
+	for (;;) {
+		i = Vid_GetKey();
+		if (i != -1)
+			break;
+		// sdh 15/11/2001: dont thrash the processor while
 		// waiting for a key press
 
 		Timer_Sleep(100);
