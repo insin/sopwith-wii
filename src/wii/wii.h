@@ -18,4 +18,7 @@
 #define CLASSIC_MINUS   17
 #define CLASSIC_PLUS    18
 #define CLASSIC_HOME    19
-#define WII_NUM_BUTTONS 20
+#define PAD_UP          20
+#define PAD_DOWN        21
+#define PAD_LEFT        22
+#define PAD_RIGHT       23
