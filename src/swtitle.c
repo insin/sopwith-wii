@@ -39,6 +39,8 @@
 #include "swsymbol.h"
 #include "swtitle.h"
 
+#include "wii.h"
+
 #define X_OFFSET ((SCR_WDTH/2)-160)
 
 // sdh -- use network edition title screen
@@ -121,7 +123,7 @@ void swtitln()
 	dispinit = TRUE;
 	swground();
 
-	// sdh 28/06/2002: cleared this up a lot, no more 
+	// sdh 28/06/2002: cleared this up a lot, no more
 	// creating objects etc
 
 	Vid_DispSymbol(260+X_OFFSET, 180, symbol_plane[0][0], 1);
@@ -289,22 +291,25 @@ static BOOL getskill()
 {
 	for (;;) {
 		clrprmpt();
-		swputs("Key: N - novice player\r\n");
-		swputs("     E - expert player\r\n");
+		swputs("Key: A - novice player\r\n");
+		swputs("     B - expert player\r\n");
 
 		Vid_Update();
 
 		swsndupdate();
 		if (ctlbreak())
 			swend(NULL, NO);
-		switch (toupper(swgetc() & 0xff)) {
-		case 'N':
+		switch (swgetc()) {
+		case REMOTE_A:
+		case CLASSIC_A:
 			playmode = PLAYMODE_NOVICE;
 			return 1;
-		case 'E':
+		case REMOTE_B:
+		case CLASSIC_B:
 			playmode = PLAYMODE_SINGLE;
 			return 1;
-		case 27:
+		case REMOTE_MINUS:
+		case CLASSIC_MINUS:
 			return 0;
 		}
 	}
@@ -319,28 +324,31 @@ void getgamemode()
 
 		clrprmpt();
 
-		swputs("Key: S - single player\r\n");
-		swputs("     C - single player against computer\r\n");
+		swputs("Key: A - single player\r\n");
+		swputs("     B - single player against computer\r\n");
 #ifdef TCPIP
 		swputs("     N - network game\r\n");
 #endif
-		swputs("     O - game options\r\n");
+		swputs("     + - game options\r\n");
 		Vid_Update();
 
 		if (ctlbreak())
 			swend(NULL, NO);
 
-		c = toupper(swgetc() & 0xff);
+		c = swgetc();
 
 		switch (c) {
-		case 'S':
+		case REMOTE_A:
+		case CLASSIC_A:
 			if (getskill())
 				return;
 			break;
-		case 'O': 
+		case REMOTE_PLUS:
+		case CLASSIC_PLUS:
 			setconfig();
 			break;
-		case 'C':
+		case REMOTE_B:
+		case CLASSIC_B:
 			playmode = PLAYMODE_COMPUTER;
 			return;
 #ifdef TCPIP
