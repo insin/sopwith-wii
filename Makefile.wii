@@ -68,7 +68,7 @@ CFILES		:= src/wii/pcsound.c \
 			src/video.c
 CPPFILES	:=
 
-INCLUDES	:= src
+INCLUDES	:= src src/wii
 
 SFILES		:=
 BINFILES	:=
