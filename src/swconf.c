@@ -40,6 +40,8 @@
 #include "swtitle.h"
 #include "swmain.h"
 
+#include "wii.h"
+
 #ifdef _WIN32
 static char config_file[] = "sopwith.ini";
 #else
@@ -53,7 +55,7 @@ static char *get_config_file()
 #ifdef _WIN32
 	// this should probably be saved in the registry,
 	// but pfft, whatever
-	
+
 	return config_file;
 
 #else
@@ -63,10 +65,10 @@ static char *get_config_file()
 		if (!namebuf) {
 			namebuf = malloc(strlen(config_file)
 					 + strlen(getenv("HOME")) + 5);
-			
+
 			sprintf(namebuf, "%s/%s", getenv("HOME"), config_file);
 		}
-		
+
 		return namebuf;
 	} else {
 		return config_file;
@@ -81,8 +83,10 @@ confoption_t confoptions[] = {
     {"conf_wounded",      CONF_BOOL, {&conf_wounded},      "wounded planes"},
     {"conf_animals",      CONF_BOOL, {&conf_animals},      "oxen and birds"},
     {"conf_harrykeys",    CONF_BOOL, {&conf_harrykeys},    "harry keys mode"},
+#ifndef HW_RVL
     {"vid_fullscreen",    CONF_BOOL, {&vid_fullscreen},    "run fullscreen"},
     {"vid_double_size",   CONF_BOOL, {&vid_double_size},   "scale window by 2x"},
+#endif
 };
 
 int num_confoptions = sizeof(confoptions) / sizeof(*confoptions);
@@ -116,7 +120,7 @@ void swloadconf()
 
 	// doesnt exist, or we cant open it for
 	// some reason
-	
+
 	if (!fs) {
 		fprintf(stderr,
 			"swloadconf: cant open %s: %s\n",
@@ -124,21 +128,21 @@ void swloadconf()
 			strerror(errno));
 		return;
 	}
-	
+
 	while(!feof(fs)) {
 		char inbuf[128];
 		char *p;
 		int i;
-		
+
 		fgets(inbuf, sizeof(inbuf)-1, fs);
 		++line;
-		
+
 		// comments
 
 		p = strchr(inbuf, '#');
 		if (p)
 			*p = '\0';
-		
+
 		// clean up string
 
 		chomp(inbuf);
@@ -216,7 +220,7 @@ void swsaveconf()
 	fprintf(fs, "# sopwith config file\n");
 	fprintf(fs, "# created by SDL Sopwith Wii\n");
 	fprintf(fs, "\n");
-	
+
 	for (i=0; i<num_confoptions; ++i) {
 		int n;
 
@@ -224,7 +228,7 @@ void swsaveconf()
 
 		for (n=3-strlen(confoptions[i].name)/8; n > 0; --n)
 			fprintf(fs, "\t");
-		
+
 		switch (confoptions[i].type) {
 		case CONF_BOOL:
 			fprintf(fs, "%i", *confoptions[i].value.b);
@@ -247,24 +251,25 @@ void swsaveconf()
 
 void setconfig()
 {
+	int selectedOption = 0;
 	for (;;) {
 		int i;
-		
+
 		clrdispv();
 
 		swcolour(2);
 		swposcur(15, 2);
 		swputs("OPTIONS");
-		
+
 		swcolour(3);
 
 		for (i=0; i<num_confoptions; ++i) {
 			char buf[40];
-			
+
 			sprintf(buf,
-				"%s %i - %s:",
-				i ? "    " : "Key:",
-				i+1, confoptions[i].description);
+				"%s %s",
+				selectedOption == i ? "*" : " ",
+				confoptions[i].description);
 
 			swposcur(1, 5+i);
 			swputs(buf);
@@ -280,52 +285,44 @@ void setconfig()
 		}
 
 		swcolour(1);
-		
+
 		swposcur(1, 22);
-		swputs("   ESC - Exit Menu");
+		swputs("  Minus - Exit Menu");
 
 		Vid_Update();
 
 		if (ctlbreak())
 			swend(NULL, NO);
 
-		i = toupper(swgetc() & 0xff);
-
-		// check if a number has been pressed for a menu option
-		
-		if (i >= '1' && i <= '9') {
-
-			i -= '1';
-
-			switch (confoptions[i].type) {
-			case CONF_BOOL:
-				*confoptions[i].value.b
-					= !*confoptions[i].value.b;
-				break;
-			default:
-				break;
-			}
+		switch(swgetc()) {
+		case REMOTE_2:
+		case CLASSIC_A:
+			*confoptions[selectedOption].value.b
+				= !*confoptions[selectedOption].value.b;
 
 			// reset the screen if we need to
-			
-			if (confoptions[i].value.b == &vid_fullscreen
-			    || confoptions[i].value.b == &vid_double_size) {
+			if (confoptions[selectedOption].value.b == &vid_fullscreen
+			    || confoptions[selectedOption].value.b == &vid_double_size) {
 				Vid_Reset();
 			}
 
 			swsaveconf();
-			
-			continue;
-		}
-
-		// other keys
-		
-		switch(i) {
-		case 27:
+			break;
+		case PAD_UP:
+			if (selectedOption > 0)
+				selectedOption = selectedOption -1;
+			break;
+		case PAD_DOWN:
+			if (selectedOption < num_confoptions - 1)
+				selectedOption = selectedOption + 1;
+			break;
+	    case REMOTE_MINUS:
+	    case CLASSIC_MINUS:
 			return;
+	    default:
+	    	break;
 		}
 	}
-		
 }
 
 //-------------------------------------------------------------------------
