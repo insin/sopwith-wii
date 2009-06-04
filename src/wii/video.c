@@ -31,13 +31,15 @@
 
 #include "vid_vga.c"
 
+#include "wii.h"
+
 // lcd mode to emulate my old laptop i used to play sopwith on :)
 
 //#define LCD
 
 static SDL_Color cga_pal[] = {
 #ifdef LCD
-	{213, 226, 138}, {150, 160, 150}, 
+	{213, 226, 138}, {150, 160, 150},
 	{120, 120, 160}, {0, 20, 200},
 #else
 	{0, 0, 0}, {0, 255, 255},
@@ -52,7 +54,10 @@ static int ctrlbreak = 0;
 static BOOL initted = 0;
 static SDL_Surface *screen;
 static SDL_Surface *screenbuf = NULL;        // draw into buffer in 2x mode
+static SDL_Joystick *sdl_joystick = NULL;
 static int colors[16];
+static int directional_hats[3] = {SDL_HAT_LEFT, SDL_HAT_RIGHT, SDL_HAT_DOWN};
+static Uint8 hat;
 
 static int getcolor(int r, int g, int b)
 {
@@ -95,8 +100,8 @@ SDL_Surface *surface_from_sopsym(sopsym_t *sym)
 		return NULL;
 
 	// set palette
-	
-	SDL_SetColors(surface, cga_pal, 0, sizeof(cga_pal)/sizeof(*cga_pal));	
+
+	SDL_SetColors(surface, cga_pal, 0, sizeof(cga_pal)/sizeof(*cga_pal));
 
 	SDL_LockSurface(surface);
 
@@ -152,7 +157,7 @@ void Vid_Update()
 
 	if (vid_double_size)
 		Vid_UpdateScaled();
-	else 
+	else
 		SDL_BlitSurface(screenbuf, NULL, screen, NULL);
 
 	SDL_Flip(screen);
@@ -192,7 +197,7 @@ static void set_icon(sopsym_t *sym)
 				mask[i / 8] = 0;
 			}
 
-			if (pixels[i]) 
+			if (pixels[i])
 				mask[i / 8] |= 0x01;
 
 			++i;
@@ -282,9 +287,28 @@ void Vid_Init()
 	fflush(stdout);
 
 	screenbuf = SDL_CreateRGBSurface(0, SCR_WDTH, SCR_HGHT, 8,
-					 0, 0, 0, 0);	
+					 0, 0, 0, 0);
 	vid_vram = screenbuf->pixels;
 	vid_pitch = screenbuf->pitch;
+
+    if (SDL_InitSubSystem(SDL_INIT_JOYSTICK) == -1)
+    {
+        printf("Unable to initialise joystick: %s\n", SDL_GetError());
+    }
+
+    if (SDL_NumJoysticks())
+    {
+		sdl_joystick = SDL_JoystickOpen(0);
+    }
+    else
+    {
+		printf("No joystick detected\n");
+    }
+
+    if (sdl_joystick)
+    {
+        SDL_JoystickEventState(SDL_ENABLE);
+    }
 
 	Vid_SetMode();
 
@@ -331,34 +355,45 @@ static int input_buffer_pop()
 	return c;
 }
 
-static sopkey_t translate_key(int sdl_key)
+static sopkey_t translate_button(int button)
 {
-	switch (sdl_key) {
-	case SDLK_LEFT:
-	case SDLK_COMMA:
-		return KEY_PULLUP;
-	case SDLK_RIGHT:
-	case SDLK_SLASH:
-		return KEY_PULLDOWN;
-	case SDLK_DOWN:
-	case SDLK_PERIOD:
-		return KEY_FLIP;
-	case SDLK_x:
+	switch (button) {
+	case REMOTE_PLUS:
+	case CLASSIC_R:
 		return KEY_ACCEL;
-	case SDLK_z:
+	case REMOTE_MINUS:
+	case CLASSIC_L:
 		return KEY_DECEL;
-	case SDLK_b:
+	case REMOTE_1:
+	case CLASSIC_B:
 		return KEY_BOMB;
-	case SDLK_SPACE:
+	case REMOTE_2:
+	case CLASSIC_A:
 		return KEY_FIRE;
-	case SDLK_h:
+	case CLASSIC_PLUS:
 		return KEY_HOME;
-	case SDLK_v:
+    case CLASSIC_Y:
+	case REMOTE_B:
 		return KEY_MISSILE;
-	case SDLK_c:
+	case CLASSIC_X:
+	case REMOTE_A:
 		return KEY_STARBURST;
-	case SDLK_s:
+	case CLASSIC_MINUS:
 		return KEY_SOUND;
+	default:
+		return KEY_UNKNOWN;
+	}
+}
+
+static sopkey_t translate_hat(int hat)
+{
+	switch (hat) {
+	case SDL_HAT_LEFT:
+		return KEY_PULLUP;
+	case SDL_HAT_RIGHT:
+		return KEY_PULLDOWN;
+	case SDL_HAT_DOWN:
+		return KEY_FLIP;
 	default:
 		return KEY_UNKNOWN;
 	}
@@ -372,45 +407,45 @@ static void getevents()
 
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
-		case SDL_KEYDOWN:
-			if (event.key.keysym.sym == SDLK_LALT)
-				altdown = 1;
-			else if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL)
-				ctrldown = 1;
-			else if (ctrldown &&
-				 (event.key.keysym.sym == SDLK_c ||
-				  event.key.keysym.sym == SDLK_BREAK)) {
-				++ctrlbreak;
-				if (ctrlbreak >= 3) {
-					fprintf(stderr,
-						"user aborted with 3 ^C's\n");
-					exit(-1);
-				}
-			} else if (event.key.keysym.sym == SDLK_ESCAPE) {
-				input_buffer_push(27);
-			} else if (event.key.keysym.sym == SDLK_RETURN) {
-				if(altdown) {
-					vid_fullscreen = !vid_fullscreen;
-					Vid_Reset();
-				} else {
-					input_buffer_push('\n');
-				}
- 			} else {
-				input_buffer_push(event.key.keysym.unicode & 0x7f);
+		case SDL_JOYBUTTONDOWN:
+			if (event.jbutton.button == REMOTE_HOME ||
+				event.jbutton.button == CLASSIC_HOME)
+			{
+				exit(0);
 			}
-			translated = translate_key(event.key.keysym.sym);
+
+			translated = translate_button(event.jbutton.button);
 			if (translated)
+			{
 				keysdown[translated] |= 3;
+			}
+
+			input_buffer_push(event.jbutton.button);
 			break;
-		case SDL_KEYUP:
-			if (event.key.keysym.sym == SDLK_LALT)
-				altdown = 0;
-			else if (event.key.keysym.sym == SDLK_LCTRL || event.key.keysym.sym == SDLK_RCTRL)
-				ctrldown = 0;
-			else {
-				translated = translate_key(event.key.keysym.sym);
+		case SDL_JOYBUTTONUP:
+			translated = translate_button(event.jbutton.button);
+			if (translated)
+			{
+				keysdown[translated] &= ~1;
+			}
+			break;
+		case SDL_JOYHATMOTION:
+			hat = event.jhat.value;
+			int i;
+			for (i = 0; i < 4; i++)
+			{
+				translated = translate_hat(directional_hats[i]);
 				if (translated)
-					keysdown[translated] &= ~1;
+				{
+					if ((hat & directional_hats[i]) == 0)
+					{
+						keysdown[translated] &= ~1;
+					}
+					else
+					{
+						keysdown[translated] |= 3;
+					}
+				}
 			}
 			break;
 		}
@@ -419,10 +454,8 @@ static void getevents()
 
 int Vid_GetKey()
 {
-	int l;
-
 	getevents();
-	
+
 	return input_buffer_pop();
 }
 
@@ -433,7 +466,7 @@ BOOL Vid_GetCtrlBreak()
 }
 
 //-----------------------------------------------------------------------
-// 
+//
 // $Log: video.c,v $
 // Revision 1.3  2003/03/26 13:53:29  fraggle
 // Allow control via arrow keys
@@ -452,7 +485,7 @@ BOOL Vid_GetCtrlBreak()
 // sdh 26/03/2002: now using platform specific vga code for drawing stuff
 //                 (#include "vid_vga.c")
 //                 rename CGA_ to Vid_
-// sdh 17/11/2001: buffered input for keypresses, 
+// sdh 17/11/2001: buffered input for keypresses,
 //                 CGA_GetLastKey->CGA_GetKey
 // sdh 07/11/2001: add CGA_Reset
 // sdh 21/10/2001: added cvs tags
