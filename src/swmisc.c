@@ -36,10 +36,14 @@
 #include "swsound.h"
 #include "swtitle.h"
 
+#include "wii.h"
+
 // sdh: emulate text display
 
 static int cur_x = 0, cur_y = 0;	// place we are writing text
 static int cur_color;		// text color
+
+static char keyboard[11] = "0123456789.";
 
 static inline void drawchar(int x, int y, int c)
 {
@@ -106,10 +110,21 @@ void swgets(char *s, int max)
 	int or_x = cur_x, or_y = cur_y;
 	int erase_len = 0;
 	int x, y;
+	int cursor_pos = strlen(s) - 1;
+	int num_keys = strlen(keyboard);
+	int key = -1;
+
+	if (cursor_pos < 1)
+	{
+		cursor_pos = 0;
+		s[0] = " ";
+	}
+	else
+	{
+		key = strchr(keyboard, s[cursor_pos]) - keyboard;
+	}
 
 	for (;;) {
-		unsigned char c;
-
 		// erase background from previous write
 
 		for (y = 0; y < 8; ++y) {
@@ -126,18 +141,46 @@ void swgets(char *s, int max)
 		swputs(s);
 		Vid_Update();
 
-		// read next keypress
-
-		while (!(c = swgetc()));
-
-		if (isprint(c) && strlen(s) < max) {
-			s[strlen(s) + 1] = '\0';
-			s[strlen(s)] = c;
-		} else if (c == '\b') {
-			// backspace
-			s[strlen(s) - 1] = '\0';
-		} else if (c == '\n') {
+		switch (swgetc()) {
+		case PAD_UP:
+			// Next character
+			key = (key + 1) % num_keys;
+			s[cursor_pos] = keyboard[key];
 			break;
+		case PAD_DOWN:
+			// Previous character
+			if (key < 1)
+				key = num_keys - 1;
+		 	else
+		 		key--;
+		 	s[cursor_pos] = keyboard[key];
+			break;
+		case PAD_RIGHT:
+			// Advance cursor to next character
+			if (cursor_pos + 1 < max && key != -1)
+			{
+				cursor_pos++;
+				s[cursor_pos] = " ";
+				s[cursor_pos + 1] = '\0';
+				key = -1;
+			}
+			break;
+		case PAD_LEFT:
+		case REMOTE_1:
+		case CLASSIC_B:
+			// Backspace to previous character
+			if (cursor_pos > 0)
+			{
+				s[cursor_pos] = '\0';
+				cursor_pos--;
+				// Set the current key to the appropriate character
+				key = strchr(keyboard, s[cursor_pos]) - keyboard;
+			}
+			break;
+		case REMOTE_2:
+		case CLASSIC_A:
+			// Done
+			return;
 		}
 	}
 }
