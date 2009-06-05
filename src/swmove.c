@@ -42,7 +42,7 @@
 #include "swtitle.h"
 #include "swutil.h"
 
-static BOOL quit;
+static SWBOOL quit;
 
 void swmove()
 {
@@ -108,7 +108,7 @@ static void nearpln(OBJECTS * obp)
 
 static int topup(int *counter, int max)
 {
-	BOOL rc;
+	SWBOOL rc;
 
 	rc = FALSE;
 	if (*counter == max)
@@ -131,12 +131,12 @@ static int topup(int *counter, int max)
 static void refuel(OBJECTS * obp)
 {
 	register OBJECTS *ob;
-	BOOL topped_up;
+	SWBOOL topped_up;
 
 	ob = obp;
 	setvdisp();
 
-	// sdh 26/10/2001: top up stuff, if anything happens update 
+	// sdh 26/10/2001: top up stuff, if anything happens update
 	// the guages (now a single function)
 	// sdh 27/10/2001: fix refueling in parallel (was a single
 	// set of ||'s and was being shortcircuited)
@@ -181,10 +181,10 @@ static int symangle(OBJECTS * ob)
 		return 4;
 }
 
-BOOL moveplyr(OBJECTS * obp)
+SWBOOL moveplyr(OBJECTS * obp)
 {
 	register OBJECTS *ob;
-	register BOOL rc;
+	register SWBOOL rc;
 	register int oldx;
 	int multkey;
 
@@ -204,7 +204,7 @@ BOOL moveplyr(OBJECTS * obp)
 			swend(NULL, YES);
 		}
 	}
-	
+
 	// sdh: use the cga (sdl) interface to
 	// read key status
 
@@ -269,7 +269,7 @@ BOOL moveplyr(OBJECTS * obp)
 
 		// sdh 26/10/2001: guages are now a single function
 
-		if (ob->ob_firing || ob->ob_bombing 
+		if (ob->ob_firing || ob->ob_bombing
 		    || ob->ob_mfiring || ob->ob_bfiring)
 			dispguages(ob);
 	}
@@ -312,7 +312,7 @@ void interpret(OBJECTS * obp, int key)
 			ob->ob_life = QUIT;
 			ob->ob_home = FALSE;
 			if (ob->ob_athome) {
-				ob->ob_state = state = 
+				ob->ob_state = state =
 				    state >= FINISHED ? GHOSTCRASHED : CRASHED;
 				ob->ob_hitcount = 0;
 			}
@@ -321,7 +321,7 @@ void interpret(OBJECTS * obp, int key)
 		}
 
 		if (key & K_HOME)
-			if (state == FLYING || state == GHOST 
+			if (state == FLYING || state == GHOST
 			    || state == WOUNDED)
 				ob->ob_home = TRUE;
 	}
@@ -381,7 +381,7 @@ void interpret(OBJECTS * obp, int key)
 		gohome(ob);
 }
 
-BOOL movecomp(OBJECTS * obp)
+SWBOOL movecomp(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int rc;
@@ -434,7 +434,7 @@ BOOL movecomp(OBJECTS * obp)
 	return rc;
 }
 
-static BOOL stallpln(OBJECTS * obp)
+static SWBOOL stallpln(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 
@@ -444,7 +444,7 @@ static BOOL stallpln(OBJECTS * obp)
 	ob->ob_speed = 0;
 	ob->ob_dy = 0;
 	ob->ob_hitcount = STALLCOUNT;
-	ob->ob_state = 
+	ob->ob_state =
 		ob->ob_state >= GHOST ? GHOSTSTALLED :
 		ob->ob_state == WOUNDED ? WOUNDSTALL : STALLED;
 	ob->ob_athome = FALSE;
@@ -454,7 +454,7 @@ static BOOL stallpln(OBJECTS * obp)
 
 
 
-BOOL movepln(OBJECTS * obp)
+SWBOOL movepln(OBJECTS * obp)
 {
 	register OBJECTS *ob = obp;
 	register int nangle, nspeed, limit, update;
@@ -465,7 +465,7 @@ BOOL movepln(OBJECTS * obp)
 	// sdh 28/4/2002: aargh! char is not neccesarily signed char,
 	// it seems. use int
 
-	static signed int gravity[] = { 
+	static signed int gravity[] = {
 		0, -1, -2, -3, -4, -3, -2, -1,
 		0, 1, 2, 3, 4, 3, 2, 1
 	};
@@ -643,7 +643,7 @@ BOOL movepln(OBJECTS * obp)
 
 				// sdh 26/10/2001: use new dispguages function
 
-				dispguages(ob); 
+				dispguages(ob);
 			}
 			ob->ob_life -= ob->ob_speed;
 		}
@@ -656,7 +656,7 @@ BOOL movepln(OBJECTS * obp)
 	}
 
 	if (endstat == WINNER && plyrplane && goingsun)
-		ob->ob_newsym = symbol_plane_win[endcount / 18]; 
+		ob->ob_newsym = symbol_plane_win[endcount / 18];
 	else if (ob->ob_state == FINISHED)
 		ob->ob_newsym = NULL;
 	else if (ob->ob_state == FALLING && !ob->ob_dx && ob->ob_dy < 0)
@@ -664,7 +664,7 @@ BOOL movepln(OBJECTS * obp)
 	else
 		ob->ob_newsym = symbol_plane[ob->ob_orient][ob->ob_angle];
 
-	//ob->ob_newsym = 
+	//ob->ob_newsym =
 	//ob->ob_state == FINISHED ? NULL :
 	//((ob->ob_state == FALLING
 	//&& !ob->ob_dx && ob->ob_dy < 0)
@@ -733,14 +733,14 @@ static void adjustfall(OBJECTS * obp)
 }
 
 
-BOOL moveshot(OBJECTS * obp)
+SWBOOL moveshot(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y;
 
 	ob = obp;
 	deletex(ob);
-	
+
 	--ob->ob_life;
 
 	if (ob->ob_life <= 0) {
@@ -763,7 +763,7 @@ BOOL moveshot(OBJECTS * obp)
 
 
 
-BOOL movebomb(OBJECTS * obp)
+SWBOOL movebomb(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y;
@@ -796,7 +796,7 @@ BOOL movebomb(OBJECTS * obp)
 		return FALSE;
 	}
 
-	ob->ob_newsym = symbol_bomb[symangle(ob)]; 
+	ob->ob_newsym = symbol_bomb[symangle(ob)];
 	insertx(ob, ob->ob_xnext);
 
 	if (y >= MAX_Y)
@@ -809,7 +809,7 @@ BOOL movebomb(OBJECTS * obp)
 
 
 
-BOOL movemiss(OBJECTS * obp)
+SWBOOL movemiss(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y, angle;
@@ -838,7 +838,7 @@ BOOL movemiss(OBJECTS * obp)
 			    =
 			    (ob->ob_angle + ob->ob_flaps +
 			     ANGLES) % ANGLES;
-			setdxdy(ob, 
+			setdxdy(ob,
 				ob->ob_speed * COS(angle),
 				ob->ob_speed * SIN(angle));
 		}
@@ -877,7 +877,7 @@ BOOL movemiss(OBJECTS * obp)
 
 
 
-BOOL moveburst(OBJECTS * obp)
+SWBOOL moveburst(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y;
@@ -900,7 +900,7 @@ BOOL moveburst(OBJECTS * obp)
 	}
 
 	ob->ob_owner->ob_target = ob;
-	ob->ob_newsym = symbol_burst[ob->ob_life & 1]; 
+	ob->ob_newsym = symbol_burst[ob->ob_life & 1];
 	insertx(ob, ob->ob_xnext);
 
 	return y < MAX_Y;
@@ -909,7 +909,7 @@ BOOL moveburst(OBJECTS * obp)
 
 
 
-BOOL movetarg(OBJECTS * obt)
+SWBOOL movetarg(OBJECTS * obt)
 {
 	int r;
 	register OBJECTS *obp, *ob;
@@ -917,7 +917,7 @@ BOOL movetarg(OBJECTS * obt)
 	ob = obt;
 	obp = objtop;
 	ob->ob_firing = NULL;
-	if (gamenum 
+	if (gamenum
 	    && ob->ob_state == STANDING
 	    && (obp->ob_state == FLYING
 		|| obp->ob_state == STALLED
@@ -934,7 +934,7 @@ BOOL movetarg(OBJECTS * obt)
 	if (ob->ob_hitcount < 0)
 		ob->ob_hitcount = 0;
 
-	if (ob->ob_state == STANDING) 
+	if (ob->ob_state == STANDING)
 		ob->ob_newsym = symbol_targets[ob->ob_orient];
 	else
 		ob->ob_newsym = symbol_target_hit;
@@ -944,7 +944,7 @@ BOOL movetarg(OBJECTS * obt)
 
 
 
-BOOL moveexpl(OBJECTS * obp)
+SWBOOL moveexpl(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y;
@@ -994,7 +994,7 @@ BOOL moveexpl(OBJECTS * obp)
 
 
 
-BOOL movesmok(OBJECTS * obp)
+SWBOOL movesmok(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	register obstate_t state;
@@ -1020,7 +1020,7 @@ BOOL movesmok(OBJECTS * obp)
 
 
 
-BOOL moveflck(OBJECTS * obp)
+SWBOOL moveflck(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y;
@@ -1047,7 +1047,7 @@ BOOL moveflck(OBJECTS * obp)
 
 	movexy(ob, &x, &y);
 	insertx(ob, ob->ob_xnext);
-	ob->ob_newsym = symbol_flock[ob->ob_orient]; 
+	ob->ob_newsym = symbol_flock[ob->ob_orient];
 	setvdisp();
 	dispwobj(ob);
 	return TRUE;
@@ -1055,7 +1055,7 @@ BOOL moveflck(OBJECTS * obp)
 
 
 
-BOOL movebird(OBJECTS * obp)
+SWBOOL movebird(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int x, y;
@@ -1071,9 +1071,9 @@ BOOL movebird(OBJECTS * obp)
 		ob->ob_dy = -ob->ob_dy;
 		ob->ob_dx = (countmove & 7) - 4;
 		ob->ob_life = BIRDLIFE;
-	} else { 
+	} else {
 		--ob->ob_life;
-		
+
 		if (ob->ob_life <= 0) {
 			ob->ob_orient = !ob->ob_orient;
 			ob->ob_life = BIRDLIFE;
@@ -1096,7 +1096,7 @@ BOOL movebird(OBJECTS * obp)
 
 
 
-BOOL moveox(OBJECTS * ob)
+SWBOOL moveox(OBJECTS * ob)
 {
 	ob->ob_newsym = symbol_ox[ob->ob_state != STANDING];
 	return TRUE;
@@ -1105,7 +1105,7 @@ BOOL moveox(OBJECTS * ob)
 
 
 
-BOOL crashpln(OBJECTS * obp)
+SWBOOL crashpln(OBJECTS * obp)
 {
 	register OBJECTS *ob, *obo;
 
@@ -1130,7 +1130,7 @@ BOOL crashpln(OBJECTS * obp)
 
 
 
-BOOL hitpln(OBJECTS * obp)
+SWBOOL hitpln(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 
@@ -1146,7 +1146,7 @@ BOOL hitpln(OBJECTS * obp)
 
 
 
-BOOL insertx(OBJECTS * ob, OBJECTS * obp)
+SWBOOL insertx(OBJECTS * ob, OBJECTS * obp)
 {
 	register OBJECTS *obs;
 	register int obx;

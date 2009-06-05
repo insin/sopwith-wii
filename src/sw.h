@@ -247,7 +247,7 @@ typedef struct obj {                            /*  Object list             */
         // char          *ob_oldsym;   // sdh 27/6/2002
 	sopsym_t      *ob_oldsym;
         void        ( *ob_drawf ) ();
-        BOOL        ( *ob_movef ) ();
+        SWBOOL        ( *ob_movef ) ();
         struct obj    *ob_xnext;
         struct obj    *ob_xprev;
         int            ob_crashcnt;

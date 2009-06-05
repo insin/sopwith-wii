@@ -39,13 +39,13 @@
 
 #include "vid_vga.c"
 
-BOOL vid_fullscreen = FALSE;
-BOOL vid_double_size = TRUE;
+SWBOOL vid_fullscreen = FALSE;
+SWBOOL vid_double_size = TRUE;
 
 static unsigned char *screenbuf;
 
 static int ctrlbreak = 0;
-static BOOL initted = 0;
+static SWBOOL initted = 0;
 static GtkWidget *window;
 static GdkImage *screen;
 static GtkWidget *screen_widget = NULL;
@@ -99,7 +99,7 @@ static void delete_event(GtkWidget *widget, GdkEvent *event, gpointer data) {
 	gtk_widget_hide(widget);
 }
 
-static void settings_bool_toggle(GtkWidget *widget, BOOL *b)
+static void settings_bool_toggle(GtkWidget *widget, SWBOOL *b)
 {
 	*b = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget)) != 0;
 
@@ -121,10 +121,10 @@ static GtkWidget *build_settings_dialog()
 	gtk_window_set_title(GTK_WINDOW(window), "Settings");
 
 	gtk_signal_connect(GTK_OBJECT(window), "destroy",
-			   GTK_SIGNAL_FUNC(delete_event), 
+			   GTK_SIGNAL_FUNC(delete_event),
 			   window);
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
-			   GTK_SIGNAL_FUNC(delete_event), 
+			   GTK_SIGNAL_FUNC(delete_event),
 			   window);
 
 	vbox = gtk_vbox_new(FALSE, 5);
@@ -141,14 +141,14 @@ static GtkWidget *build_settings_dialog()
 
 	for (i=0; i<num_confoptions; ++i) {
 		GtkWidget *widget;
-			
+
 		switch (confoptions[i].type) {
 		case CONF_BOOL:
 			widget = gtk_check_button_new_with_label
 				(confoptions[i].description);
 
 			gtk_box_pack_start(GTK_BOX(i % 2 ? vbox2 : vbox),
-					   widget, 
+					   widget,
 					   TRUE, TRUE, 0);
 			gtk_toggle_button_set_active
 				(GTK_TOGGLE_BUTTON(widget),
@@ -162,7 +162,7 @@ static GtkWidget *build_settings_dialog()
 			break;
 		}
 	}
-		
+
 	gtk_widget_show(vbox);
 	gtk_widget_show(vbox2);
 	gtk_widget_show(hbox);
@@ -174,7 +174,7 @@ static GtkWidget *build_settings_dialog()
 	button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 	gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(hide_callback), 
+			   GTK_SIGNAL_FUNC(hide_callback),
 			   window);
 	gtk_widget_show(button);
 
@@ -206,10 +206,10 @@ static GtkWidget *build_about_window()
 
 	// window
 
-	window = gtk_dialog_new(); 
+	window = gtk_dialog_new();
 
 	gtk_container_set_border_width(GTK_CONTAINER(GTK_DIALOG(window)->vbox), 6);
-	gtk_window_set_title(GTK_WINDOW(window), 
+	gtk_window_set_title(GTK_WINDOW(window),
 			     "About Sopwith");
 
 	gtk_signal_connect(GTK_OBJECT(window), "destroy",
@@ -222,7 +222,7 @@ static GtkWidget *build_about_window()
 	label = gtk_label_new(NULL);
 
 	gtk_label_set_justify(GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-	gtk_label_set_markup(GTK_LABEL(label), 
+	gtk_label_set_markup(GTK_LABEL(label),
 		"<span size=\"xx-large\" weight=\"bold\">"
 		"Gtk+ Sopwith " VERSION "</span>\n\n"
 		"Classic biplane shoot-em-up game.\n\n"
@@ -255,7 +255,7 @@ static GtkWidget *build_about_window()
 	return window;
 }
 
-static void about_window(gpointer callback_data, 
+static void about_window(gpointer callback_data,
 			 guint callback_action,
 			 GtkWidget *widget)
 {
@@ -270,12 +270,12 @@ static void about_window(gpointer callback_data,
 static GtkItemFactoryEntry menu_items[] = {
 	{ "/_Game",              NULL,         NULL,  0,    "<Branch>" },
 	{ "/Game/_Single Player",     NULL,         NULL,  0,    "<Branch>"},
-	{ "/Game/Single Player/Play in _Novice Mode",       NULL,    
+	{ "/Game/Single Player/Play in _Novice Mode",       NULL,
 			new_game,   PLAYMODE_NOVICE},
-	{ "/Game/Single Player/Play in _Expert Mode",       NULL,    
+	{ "/Game/Single Player/Play in _Expert Mode",       NULL,
 			new_game,   PLAYMODE_SINGLE},
 	{ "/Game/Single Player/sep1",         NULL,    NULL,       0,   "<Separator>"},
-	{ "/Game/Single Player/Play vs. _Computer", NULL,    
+	{ "/Game/Single Player/Play vs. _Computer", NULL,
 			new_game,   PLAYMODE_COMPUTER},
 #ifdef TCPIP
 	// not done yet:
@@ -287,10 +287,10 @@ static GtkItemFactoryEntry menu_items[] = {
 	{ "/Game/_End Game",     NULL,         new_game,  PLAYMODE_UNSET,
 			"<StockItem>", GTK_STOCK_CLOSE},
 	{ "/Game/sep1",          NULL,         NULL,  0,    "<Separator>"},
-	{ "/Game/_Quit",         NULL,         exit,  0,    
+	{ "/Game/_Quit",         NULL,         exit,  0,
 			"<StockItem>", GTK_STOCK_QUIT},
 	{ "/_Settings",		 NULL,	       NULL,  0,    "<Branch>"},
-	{ "/Settings/_Preferences",   NULL,    settings_dialog,  0,    
+	{ "/Settings/_Preferences",   NULL,    settings_dialog,  0,
 			"<StockItem>", GTK_STOCK_PREFERENCES},
 	{ "/_Help",              NULL,         NULL,  0,    "<Branch>"},
 	{ "/Help/_About",        NULL,         about_window,  0,    NULL},
@@ -304,13 +304,13 @@ static GtkWidget *build_menus()
 
 	accel_group = gtk_accel_group_new ();
 
-	item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR, 
-					    "<main>", 
+	item_factory = gtk_item_factory_new(GTK_TYPE_MENU_BAR,
+					    "<main>",
 					    accel_group);
 
-	gtk_item_factory_create_items(item_factory, 
-				      num_menu_items, 
-				      menu_items, 
+	gtk_item_factory_create_items(item_factory,
+				      num_menu_items,
+				      menu_items,
 				      NULL);
 
 	gtk_window_add_accel_group (GTK_WINDOW (window), accel_group);
@@ -357,10 +357,10 @@ static gint key_snooper(GtkWidget *widget,
 			gpointer func_data)
 {
 	int key = event->keyval;
-	static BOOL ctrldown = FALSE;
+	static SWBOOL ctrldown = FALSE;
 	sopkey_t translated;
 
-	if (key >= GDK_A && key <= GDK_Z) 
+	if (key >= GDK_A && key <= GDK_Z)
 		key += GDK_a - GDK_A;
 
 	if (event->type == GDK_KEY_PRESS) {
@@ -368,7 +368,7 @@ static gint key_snooper(GtkWidget *widget,
 
 		if (translated)
 			keysdown[translated] |= 3;
-		
+
 		if (key == GDK_c && ctrldown) {
 			++ctrlbreak;
 			if (ctrlbreak > 3) {
@@ -394,7 +394,7 @@ static gint key_snooper(GtkWidget *widget,
 		if(key == GDK_Control_L)
 			ctrldown = FALSE;
 	}
-	
+
 	return 0;
 }
 
@@ -428,7 +428,7 @@ static GtkWidget *build_gui()
 
 void get_gtk_events()
 {
-	while(gtk_events_pending()) 
+	while(gtk_events_pending())
 		gtk_main_iteration_do(0);
 }
 
@@ -470,7 +470,7 @@ static unsigned long getcolor(int r, int g, int b)
 			int r2 = c->red >> 8, g2 = c->green >> 8,
 				b2 = c->blue >> 8;
 			int diff = (r2-r)*(r2-r) + (g2-g)*(g2-g) + (b2-b)*(b2-b);
-			
+
 			if (!diff) {
 				return i;
 			}
@@ -483,7 +483,7 @@ static unsigned long getcolor(int r, int g, int b)
 
 /*
 		printf("best: %i (%i)\n", l, best);
-		printf("[%i, %i, %i], [%i, %i, %i]\n", 
+		printf("[%i, %i, %i], [%i, %i, %i]\n",
 		       r, g, b,
 		       colormap->colors[l].red,
 		       colormap->colors[l].green,
@@ -532,7 +532,7 @@ static void Vid_UpdateScaled()
 			pixels2 += SCR_WDTH;
 		}
 	} else if(screen->bpp == 2) {
-		register unsigned short *pixels = 
+		register unsigned short *pixels =
 			(unsigned short *) screen->mem;
 		register unsigned char *pixels2 = screenbuf;
 
@@ -567,10 +567,10 @@ static void Vid_UpdateScaled()
 				int c = *p2++;
 				p[0] = p[3] = p[pitch] = p[pitch+3] = c & 0xff;
 				++p;
-				p[0] = p[3] = p[pitch] = p[pitch+3] 
+				p[0] = p[3] = p[pitch] = p[pitch+3]
 					= (c >> 8) & 0xff;
 				++p;
-				p[0] = p[3] = p[pitch] = p[pitch+3] 
+				p[0] = p[3] = p[pitch] = p[pitch+3]
 					= (c >> 16) & 0xff;
 				++p;
 				p += 3;
@@ -587,7 +587,7 @@ static void Vid_UpdateScaled()
 			register unsigned char *p2 = pixels2;
 
 			for (x = 0; x < SCR_WDTH; ++x) {
-				p[0] = p[1] = p[pitch] = p[pitch+1] 
+				p[0] = p[1] = p[pitch] = p[pitch+1]
 					= colors[*p2++];
 				p += 2;
 			}
@@ -609,7 +609,7 @@ static void Vid_UpdateUnscaled()
 	// if it doesnt work i'm incredibly sorry
 
 	if (screen->bpp == 1) {
-		register unsigned char *pixels = 
+		register unsigned char *pixels =
 			(unsigned char *) screen->mem;
 		register unsigned char *pixels2 = screenbuf;
 
@@ -617,14 +617,14 @@ static void Vid_UpdateUnscaled()
 			register unsigned char *p = pixels;
 			register unsigned char *p2 = pixels2;
 
-			for (x=0; x<SCR_WDTH; ++x) 
+			for (x=0; x<SCR_WDTH; ++x)
 				*p++ = colors[*p2++];
 
 			pixels += pitch;
 			pixels2 += SCR_WDTH;
 		}
 	} else if (screen->bpp == 2) {
-		register unsigned short *pixels = 
+		register unsigned short *pixels =
 			(unsigned short *) screen->mem;
 		register unsigned char *pixels2 = screenbuf;
 
@@ -634,7 +634,7 @@ static void Vid_UpdateUnscaled()
 
 			for (x=0; x<SCR_WDTH; ++x)
 				*p++ = colors[*p2++];
-			
+
 			pixels += pitch;
 			pixels2 += SCR_WDTH;
 		}
@@ -769,7 +769,7 @@ static void Vid_SetMode()
 	}
 
 	if (screen_widget) {
-		gtk_image_set(GTK_IMAGE(screen_widget), 
+		gtk_image_set(GTK_IMAGE(screen_widget),
 			      screen, NULL);
 	}
 }
@@ -807,7 +807,7 @@ void Vid_Init()
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	gtk_window_set_policy(GTK_WINDOW(window), 0, 0, 1);
-	
+
 	Vid_SetMode();
 
 	gui = build_gui();
@@ -819,11 +819,11 @@ void Vid_Init()
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
 			   GTK_SIGNAL_FUNC(exit), NULL);
 
-	gtk_window_set_title(GTK_WINDOW(window), 
+	gtk_window_set_title(GTK_WINDOW(window),
 			     "Gtk+ Sopwith");
 
 	gtk_widget_show(gui);
-	gtk_widget_show(window);	
+	gtk_widget_show(window);
 
 	init_colormap();
 
@@ -864,7 +864,7 @@ int Vid_GetKey()
 	return input_buffer_pop();
 }
 
-BOOL Vid_GetCtrlBreak()
+SWBOOL Vid_GetCtrlBreak()
 {
 	getevents();
 	return ctrlbreak;
@@ -872,7 +872,7 @@ BOOL Vid_GetCtrlBreak()
 
 
 //-----------------------------------------------------------------------
-// 
+//
 // $Log: video.c,v $
 // Revision 1.8  2003/06/08 00:48:30  fraggle
 // use GDK_IMAGE_FASTEST instead of GDK_IMAGE_NORMAL for speed

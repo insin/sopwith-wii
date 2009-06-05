@@ -41,7 +41,7 @@ static void swreport()
 	puts("\r\n");
 }
 
-void swend(char *msg, BOOL update)
+void swend(char *msg, SWBOOL update)
 {
 	register char *closmsg = NULL;
 	char *multclos(), *asynclos();
@@ -142,7 +142,7 @@ void loser(OBJECTS * ob)
 
 	endsts[n] = LOSER;
 
-	// sdh 28/4/2002: change swposcur to center screen on 
+	// sdh 28/4/2002: change swposcur to center screen on
 	// non-320 pixel wide screens
 
 	if (n == player) {

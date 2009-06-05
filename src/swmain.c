@@ -42,12 +42,12 @@
 
 // sdh 28/10/2001: game options
 
-BOOL conf_missiles = 0;             // allow missiles: replaces missok
-BOOL conf_solidground = 0;          // draw ground solid like in sopwith 1
-BOOL conf_hudsplats = 1;            // splatted birds etc
-BOOL conf_wounded = 1;              // enable wounded planes
-BOOL conf_animals = 1;              // birds and oxes
-BOOL conf_harrykeys = 0;            // plane rotation relative to screen
+SWBOOL conf_missiles = 0;             // allow missiles: replaces missok
+SWBOOL conf_solidground = 0;          // draw ground solid like in sopwith 1
+SWBOOL conf_hudsplats = 1;            // splatted birds etc
+SWBOOL conf_wounded = 1;              // enable wounded planes
+SWBOOL conf_animals = 1;              // birds and oxes
+SWBOOL conf_harrykeys = 0;            // plane rotation relative to screen
 
 playmode_t playmode;		/* Mode of play                     */
 GAMES *currgame;		/* Game parameters and current game */
@@ -62,20 +62,20 @@ int gamenum;			/* Current game number              */
 int gmaxspeed, gminspeed;	/* Speed range based on game number */
 int targrnge;			/* Target range based on game number */
 
-BOOL hires;			/* High res flag                    */
-BOOL disppos;			/* Display position flag            */
-BOOL titleflg;			/* Title flag                       */
+SWBOOL hires;			/* High res flag                    */
+SWBOOL disppos;			/* Display position flag            */
+SWBOOL titleflg;			/* Title flag                       */
 int dispdbg;			/* Debug value to display           */
-BOOL soundflg;			/* Sound flag                       */
-BOOL repflag;			/* Report statistics flag           */
-BOOL joystick;			/* Joystick being used              */
-BOOL ibmkeybd;			/* IBM-like keyboard being used     */
-BOOL inplay;			/* Game is in play                  */
+SWBOOL soundflg;			/* Sound flag                       */
+SWBOOL repflag;			/* Report statistics flag           */
+SWBOOL joystick;			/* Joystick being used              */
+SWBOOL ibmkeybd;			/* IBM-like keyboard being used     */
+SWBOOL inplay;			/* Game is in play                  */
 int koveride;			/* Keyboard override index number   */
 
 int displx;			/* Display left and right           */
 int dispdx;			/* Display shift                    */
-BOOL dispinit;			/* Inialized display flag           */
+SWBOOL dispinit;			/* Inialized display flag           */
 
 OBJECTS *drawlist;		/* Onscreen object list             */
 OBJECTS *nobjects;		/* Objects list.                    */
@@ -98,11 +98,11 @@ int endsts[MAX_PLYR];		/* End of game status and move count */
 int endcount;
 int player;			/* Pointer to player's object       */
 int currobx;			/* Current object index             */
-BOOL plyrplane;			/* Current object is player flag    */
-BOOL compplane;			/* Current object is a comp plane   */
+SWBOOL plyrplane;			/* Current object is player flag    */
+SWBOOL compplane;			/* Current object is a comp plane   */
 OLDWDISP wdisp[MAX_OBJS];	/* World display status             */
-BOOL goingsun;			/* Going to the sun flag            */
-BOOL forcdisp;			/* Force display of ground          */
+SWBOOL goingsun;			/* Going to the sun flag            */
+SWBOOL forcdisp;			/* Force display of ground          */
 char *histin, *histout;		/* History input and output files   */
 unsigned explseed;		/* random seed for explosion        */
 
@@ -160,7 +160,7 @@ int SDL_main(int argc, char *argv[])
 		do {
 			swsndupdate();
 
-			// sdh 15/11/2001: dont thrash the 
+			// sdh 15/11/2001: dont thrash the
 			// processor while waiting
 			Timer_Sleep(10);
 		} while (Timer_GetMS() < nexttic);

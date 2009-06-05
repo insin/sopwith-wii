@@ -53,7 +53,7 @@ static void settimeout(int ms)
 	timeout_time = Timer_GetMS() + ms;
 }
 
-static BOOL timeout()
+static SWBOOL timeout()
 {
 	return Timer_GetMS() >= timeout_time;
 }
@@ -119,18 +119,18 @@ int asynget(OBJECTS * ob)
 
 void asynput(int movekey)
 {
-	static BOOL first = TRUE;
-	
+	static SWBOOL first = TRUE;
+
 	if (first)
 		first = FALSE;
-	else 
+	else
 
 	swflush();
 
 	sendshort(movekey);
 }
 
-char *asynclos(BOOL update)
+char *asynclos(SWBOOL update)
 {
 	commterm();
 	return NULL;
@@ -139,7 +139,7 @@ char *asynclos(BOOL update)
 
 // this function is called by the multiplayer planes
 
-BOOL movemult(OBJECTS * obp)
+SWBOOL movemult(OBJECTS * obp)
 {
 	register OBJECTS *ob;
 	int cmd;
@@ -250,14 +250,14 @@ static void tcploop_connect()
 	swputs(asynhost);
 	swputs(" ...");
 	Vid_Update();
-	
+
 	commconnect(asynhost);
 
 	clrprmpt();
 	swputs("  Connected, waiting for other player\n");
 	Vid_Update();
 
-	// for the first 5 seconds, listen to see if theres another player 
+	// for the first 5 seconds, listen to see if theres another player
 	// there
 
 	for (time = Timer_GetMS() + 5000; Timer_GetMS() < time; ) {
@@ -267,7 +267,7 @@ static void tcploop_connect()
 			fprintf(stderr, "tcploop_connect: user aborted\n");
 			exit(-1);
 		}
-		
+
 		c = commin();
 
 		if (c >= 0) {
@@ -276,7 +276,7 @@ static void tcploop_connect()
 				player = 1;
 				return;
 			} else {
-				fprintf(stderr, 
+				fprintf(stderr,
 					"tcploop_connect: invalid"
 					"char recieved\n");
 				exit(-1);
@@ -303,13 +303,13 @@ static void tcploop_connect()
 				player = 0;
 				return;
 			} else {
-				fprintf(stderr, 
+				fprintf(stderr,
 					"tcploop_connect: invalid"
 					"char recieved\n");
 				exit(-1);
 			}
 		}
-	
+
 
 		if (Timer_GetMS() > time) {
 			commout('?');

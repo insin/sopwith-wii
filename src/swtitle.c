@@ -158,7 +158,7 @@ void swtitlf()
 // rename to swmenus.c?
 //
 
-BOOL ctlbreak()
+SWBOOL ctlbreak()
 {
 	return Vid_GetCtrlBreak();
 }
@@ -179,7 +179,7 @@ void clrprmpt()
 	swposcur(0, 20);
 }
 
-static BOOL gethost()
+static SWBOOL gethost()
 {
 	clrprmpt();
 
@@ -191,7 +191,7 @@ static BOOL gethost()
 
 // network menu
 
-static BOOL getnet()
+static SWBOOL getnet()
 {
 	for (;;) {
 		clrprmpt();
@@ -287,7 +287,7 @@ int getgame()
 
 // sdh: get single player skill level
 
-static BOOL getskill()
+static SWBOOL getskill()
 {
 	for (;;) {
 		clrprmpt();

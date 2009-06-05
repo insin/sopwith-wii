@@ -48,14 +48,14 @@
 
 #include "vid_4bit.c"
 
-BOOL vid_fullscreen = FALSE;
-BOOL vid_double_size = TRUE;
+SWBOOL vid_fullscreen = FALSE;
+SWBOOL vid_double_size = TRUE;
 
 static unsigned char *screenbuf;
 
 static int fb_fd; 			// framebuffer file descriptor
 static int fb_w, fb_h;
-static BOOL fb_enabled = TRUE;
+static SWBOOL fb_enabled = TRUE;
 static unsigned char *framebuffer;	// mmaped framebuffer
 static unsigned char *scrbuf;		// screen buffer
 
@@ -65,7 +65,7 @@ static struct termios kb_oldtio;
 static int ctrlbreak = 0;
 static int colors[16];
 
-static BOOL in_vid_mode = 0;
+static SWBOOL in_vid_mode = 0;
 
 //============================================================================
 //
@@ -137,7 +137,7 @@ static void Vid_UnsetMode()
 	ioctl(kb_fd, KDSETMODE, KD_TEXT);
 
 	// this is uberlame.
-	// switch to the next console and back again, this will 
+	// switch to the next console and back again, this will
 	// redraw the console
 	{
 		int n = fbdev_getvt();
@@ -174,7 +174,7 @@ static void Vid_SetMode()
 			exit(-1);
 		}
 	}
-        
+
 	ioctl(fb_fd, KDSETMODE, KD_GRAPHICS);
         ioctl(fb_fd, FBIOGET_FSCREENINFO, &fixinfo);
         ioctl(fb_fd, FBIOGET_VSCREENINFO, &varinfo);
@@ -247,7 +247,7 @@ static void Vid_SetMode()
 
 	{
 		struct vt_mode mode;
-		
+
 		// notify us of vt changes
 		ioctl(kb_fd, VT_GETMODE, &mode);
 		mode.mode = VT_PROCESS;
@@ -289,7 +289,7 @@ static inline sopkey_t translate_key(int c)
 {
 	switch (tolower(c)) {
 		// use j,k and l because of the keyboard layout
-	case 'k': 
+	case 'k':
 		return KEY_FLIP;
 	case 'j':
 		return KEY_PULLUP;
@@ -311,7 +311,7 @@ static inline sopkey_t translate_key(int c)
 		return KEY_STARBURST;
 	case 's':
 		return KEY_SOUND;
-	default: 
+	default:
 		return KEY_UNKNOWN;
 	}
 }
@@ -327,9 +327,9 @@ static inline int getkey()
 	translated = translate_key(c);
 
 	// we dont actually know if a key is down or not,
-	// only if it has been pressed since last run of 
+	// only if it has been pressed since last run of
 	// Vid_GetGameKeys, so set the second bit only
-	
+
 	if (translated)
 		keysdown[translated] |= 2;
 
@@ -352,14 +352,14 @@ int Vid_GetKey()
 	return c < 0 ? 0 : c;
 }
 
-BOOL Vid_GetCtrlBreak()
+SWBOOL Vid_GetCtrlBreak()
 {
 	return ctrlbreak > 0;
 }
 
 
 //-----------------------------------------------------------------------
-// 
+//
 // $Log: video.c,v $
 // Revision 1.3  2003/03/26 14:58:34  fraggle
 // devfs support

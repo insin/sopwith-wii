@@ -37,7 +37,7 @@ typedef struct
 	} type;
 	union {
 		void *v;
-		BOOL *b;
+		SWBOOL *b;
 		int *i;
 	} value;
 	char *description;

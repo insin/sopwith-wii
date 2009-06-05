@@ -27,7 +27,7 @@
 
 // sdh 21/10/2001: moved BOOL here from sw.h, made into enum
 
-typedef enum {FALSE, TRUE} BOOL;
+typedef enum {FALSE, TRUE} SWBOOL;
 enum {NO, YES};
 
 #endif

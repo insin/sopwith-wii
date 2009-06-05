@@ -37,7 +37,7 @@
 
 static SDL_Color cga_pal[] = {
 #ifdef LCD
-	{213, 226, 138}, {150, 160, 150}, 
+	{213, 226, 138}, {150, 160, 150},
 	{120, 120, 160}, {0, 20, 200},
 #else
 	{0, 0, 0}, {0, 255, 255},
@@ -45,11 +45,11 @@ static SDL_Color cga_pal[] = {
 #endif
 };
 
-BOOL vid_fullscreen = FALSE;
-BOOL vid_double_size = TRUE;
+SWBOOL vid_fullscreen = FALSE;
+SWBOOL vid_double_size = TRUE;
 
 static int ctrlbreak = 0;
-static BOOL initted = 0;
+static SWBOOL initted = 0;
 static SDL_Surface *screen;
 static SDL_Surface *screenbuf = NULL;        // draw into buffer in 2x mode
 static int colors[16];
@@ -95,8 +95,8 @@ SDL_Surface *surface_from_sopsym(sopsym_t *sym)
 		return NULL;
 
 	// set palette
-	
-	SDL_SetColors(surface, cga_pal, 0, sizeof(cga_pal)/sizeof(*cga_pal));	
+
+	SDL_SetColors(surface, cga_pal, 0, sizeof(cga_pal)/sizeof(*cga_pal));
 
 	SDL_LockSurface(surface);
 
@@ -152,7 +152,7 @@ void Vid_Update()
 
 	if (vid_double_size)
 		Vid_UpdateScaled();
-	else 
+	else
 		SDL_BlitSurface(screenbuf, NULL, screen, NULL);
 
 	SDL_UpdateRect(screen, 0, 0, screen->w, screen->h);
@@ -192,7 +192,7 @@ static void set_icon(sopsym_t *sym)
 				mask[i / 8] = 0;
 			}
 
-			if (pixels[i]) 
+			if (pixels[i])
 				mask[i / 8] |= 0x01;
 
 			++i;
@@ -282,7 +282,7 @@ void Vid_Init()
 	fflush(stdout);
 
 	screenbuf = SDL_CreateRGBSurface(0, SCR_WDTH, SCR_HGHT, 8,
-					 0, 0, 0, 0);	
+					 0, 0, 0, 0);
 	vid_vram = screenbuf->pixels;
 	vid_pitch = screenbuf->pitch;
 
@@ -367,7 +367,7 @@ static sopkey_t translate_key(int sdl_key)
 static void getevents()
 {
 	SDL_Event event;
-	static BOOL ctrldown = 0, altdown = 0;
+	static SWBOOL ctrldown = 0, altdown = 0;
 	sopkey_t translated;
 
 	while (SDL_PollEvent(&event)) {
@@ -422,18 +422,18 @@ int Vid_GetKey()
 	int l;
 
 	getevents();
-	
+
 	return input_buffer_pop();
 }
 
-BOOL Vid_GetCtrlBreak()
+SWBOOL Vid_GetCtrlBreak()
 {
 	getevents();
 	return ctrlbreak;
 }
 
 //-----------------------------------------------------------------------
-// 
+//
 // $Log: video.c,v $
 // Revision 1.3  2003/03/26 13:53:29  fraggle
 // Allow control via arrow keys
@@ -452,7 +452,7 @@ BOOL Vid_GetCtrlBreak()
 // sdh 26/03/2002: now using platform specific vga code for drawing stuff
 //                 (#include "vid_vga.c")
 //                 rename CGA_ to Vid_
-// sdh 17/11/2001: buffered input for keypresses, 
+// sdh 17/11/2001: buffered input for keypresses,
 //                 CGA_GetLastKey->CGA_GetKey
 // sdh 07/11/2001: add CGA_Reset
 // sdh 21/10/2001: added cvs tags

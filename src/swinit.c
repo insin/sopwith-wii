@@ -51,8 +51,12 @@
 #include "swtitle.h"
 #include "swutil.h"
 
+#ifdef HW_RVL
+#include "fat.h"
+#endif
+
 static int savescore;		/* save players score on restart  */
-static BOOL ghost;		/* ghost display flag             */
+static SWBOOL ghost;		/* ghost display flag             */
 
 static char helptxt[] =
 "\n"
@@ -216,7 +220,7 @@ void dispguages(OBJECTS *ob)
 	if (conf_missiles) {
 
 		// missiles
-		
+
 		dispgge(x += sep, ob->ob_missiles, MAXMISSILES, ob->ob_clr);
 
 // starburst (flares)
@@ -278,7 +282,7 @@ static void dispworld()
 
 
 
-void initdisp(BOOL reset)
+void initdisp(SWBOOL reset)
 {
 	OBJECTS *ob;
 	OBJECTS ghostob;
@@ -713,7 +717,7 @@ static void inittarg()
 		ob->ob_life = i;
 
 		if (playmode != PLAYMODE_ASYNCH)
-			ob->ob_owner = 
+			ob->ob_owner =
 				&nobjects[(i < MAX_TARG / 2
 					   && i > MAX_TARG / 2 - 4)
 						? 0 : 1];
@@ -738,7 +742,7 @@ void initexpl(OBJECTS * obop, int small)
 	// int life;
 	int obox, oboy, obodx, obody, oboclr;
 	obtype_t obotype;
-	BOOL mansym;
+	SWBOOL mansym;
 	int orient;
 
 	obox = obo->ob_x + (obo->ob_newsym->w / 2);
@@ -755,7 +759,7 @@ void initexpl(OBJECTS * obop, int small)
 		ic = small ? 6 : 2;
 		speed = gminspeed >> ((explseed & 7) != 7);
 	}
-	mansym = obotype == PLANE 
+	mansym = obotype == PLANE
 		 && (obo->ob_state == FLYING || obo->ob_state == WOUNDED);
 
 	for (i = 1; i <= 15; i += ic) {
@@ -989,7 +993,7 @@ void swinitlevel()
 		currgame = &swgames[0];
 
 		// single player
-		
+
 		initplyr(NULL);
 		initcomp(NULL);
 		initcomp(NULL);
@@ -1014,7 +1018,7 @@ void swrestart()
 	OBJECTS *ob;
 	int inc;
 	int time;
-		
+
 	if (endsts[player] == WINNER) {
 		ob = &nobjects[player];
 		inc = 0;
@@ -1025,7 +1029,7 @@ void swrestart()
 			dispscore(ob);
 
 			Vid_Update();
-			
+
 			// sdh 27/10/2001: use new time code for delay
 
 			time = Timer_GetMS();
@@ -1056,16 +1060,24 @@ char **g_argv;
 
 void swinit(int argc, char *argv[])
 {
-	BOOL n = FALSE;
-	BOOL s = FALSE;
-	BOOL c = FALSE;
-	BOOL a = FALSE;
-	BOOL k = FALSE;
+#ifdef HW_RVL
+    if (!fatInitDefault())
+    {
+        perror("Unable to initialize FAT subsystem, exiting.\n");
+        exit(1);
+    }
+#endif
+
+	SWBOOL n = FALSE;
+	SWBOOL s = FALSE;
+	SWBOOL c = FALSE;
+	SWBOOL a = FALSE;
+	SWBOOL k = FALSE;
 	int modeset = 0, keyset;
 	int i;
 
 	// store global argc/argv
-	
+
 	g_argc = argc;
 	g_argv = argv;
 
@@ -1094,7 +1106,7 @@ void swinit(int argc, char *argv[])
 		exit(1);
 	}
 #endif
-	
+
 	// sdh 29/10/2001: load config from configuration file
 
 	swloadconf();
@@ -1114,7 +1126,7 @@ void swinit(int argc, char *argv[])
 			soundflg = 1;
 		else if (!strcasecmp(argv[i], "-x"))
 			conf_missiles = 1;
-		else 
+		else
 #ifdef TCPIP
 			if (!strcasecmp(argv[i], "-l")) {
 			a = 1;
@@ -1128,7 +1140,7 @@ void swinit(int argc, char *argv[])
 				fprintf(stderr, "insufficient arguments to -j\n");
 				exit(-1);
 			}
-		} else 
+		} else
 #endif
 		{
 			puts(helptxt);
@@ -1162,13 +1174,13 @@ void swinit(int argc, char *argv[])
 
 	//        explseed = histinit( explseed );
 	initsndt();
-	initgrnd();           // needed for title screen 
-	
+	initgrnd();           // needed for title screen
+
 	// sdh 26/03/2002: remove swinitgrph
 
 	// set playmode if we can, from command line options
 
-	playmode = 
+	playmode =
 		n ? PLAYMODE_NOVICE :
 		s ? PLAYMODE_SINGLE :
 		c ? PLAYMODE_COMPUTER :

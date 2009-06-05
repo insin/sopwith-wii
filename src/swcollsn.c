@@ -87,7 +87,7 @@ static void colltest(OBJECTS * ob1, OBJECTS * ob2)
 
 	// no intersection?
 
-	if (w <= 0)     
+	if (w <= 0)
 		return;
 
 	// y:
@@ -139,7 +139,7 @@ static void colltest(OBJECTS * ob1, OBJECTS * ob2)
 					killed[killptr] = ob2;
 					killer[killptr++] = ob1;
 				}
-				return; 
+				return;
 			}
 
 			++d1; ++d2;
@@ -167,7 +167,7 @@ static void scoretarg(OBJECTS *obp, int score)
 	}
 }
 
-static BOOL scorepenalty(obtype_t ttype, OBJECTS * ob, int score)
+static SWBOOL scorepenalty(obtype_t ttype, OBJECTS * ob, int score)
 {
 	register OBJECTS *obt;
 
@@ -461,7 +461,7 @@ void tstcrash(OBJECTS * obp)
 		// out of range?
 
 		if (y >= sym->h)
-			continue; 
+			continue;
 
 		// check for collision at this point
 
@@ -490,7 +490,7 @@ void dispd(int n, int size)
 {
 	register int i = 0;
 	register int d, t;
-	register BOOL first = TRUE;
+	register SWBOOL first = TRUE;
 
 	// sdh 24/10/2001: make sure we use the main video buffer
 
@@ -521,7 +521,7 @@ void dispscore(OBJECTS * ob)
 	setvdisp();
 
 	Vid_Box(0, 16, 48, 16, 0);
-	
+
 	swposcur((ob->ob_clr - 1) * 7 + 2, 24);
 	swcolour(ob->ob_clr);
 	dispd(ob->ob_score, 6);

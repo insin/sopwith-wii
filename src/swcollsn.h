@@ -29,7 +29,7 @@ extern void tstcrash(OBJECTS *obp);
 extern void scorepln(OBJECTS *ob);
 extern void dispscore(OBJECTS *obp);
 extern void dispd(int n, int size);
-extern BOOL equal(int (*x)(), int (*y)() );
+extern SWBOOL equal(int (*x)(), int (*y)() );
 
 #endif
 

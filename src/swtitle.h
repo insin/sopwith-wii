@@ -25,7 +25,7 @@
 #include "sw.h"
 
 extern void clrprmpt();
-extern BOOL ctlbreak();
+extern SWBOOL ctlbreak();
 extern void getgamemode();
 extern int getgame();
 extern void swtitln();

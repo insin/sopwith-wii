@@ -42,8 +42,10 @@
 
 #include "wii.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 static char config_file[] = "sopwith.ini";
+#elif defined(HW_RVL)
+static char config_file[] = "sd:/apps/sdl_sopwith/sopwith.ini";
 #else
 static char config_file[] = ".sopwithrc";
 #endif
@@ -52,7 +54,7 @@ static char config_file[] = ".sopwithrc";
 
 static char *get_config_file()
 {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(HW_RVL)
 	// this should probably be saved in the registry,
 	// but pfft, whatever
 

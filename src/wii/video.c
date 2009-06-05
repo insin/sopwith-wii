@@ -47,11 +47,11 @@ static SDL_Color cga_pal[] = {
 #endif
 };
 
-BOOL vid_fullscreen = FALSE;
-BOOL vid_double_size = TRUE;
+SWBOOL vid_fullscreen = FALSE;
+SWBOOL vid_double_size = TRUE;
 
 static int ctrlbreak = 0;
-static BOOL initted = 0;
+static SWBOOL initted = 0;
 static SDL_Surface *screen;
 static SDL_Surface *screenbuf = NULL;        // draw into buffer in 2x mode
 static SDL_Joystick *sdl_joystick = NULL;
@@ -416,7 +416,7 @@ static int hat_to_wii(int hat)
 static void getevents()
 {
 	SDL_Event event;
-	static BOOL ctrldown = 0, altdown = 0;
+	static SWBOOL ctrldown = 0, altdown = 0;
 	sopkey_t translated;
 
 	while (SDL_PollEvent(&event)) {
@@ -478,7 +478,7 @@ int Vid_GetKey()
 	return input_buffer_pop();
 }
 
-BOOL Vid_GetCtrlBreak()
+SWBOOL Vid_GetCtrlBreak()
 {
 	getevents();
 	return ctrlbreak;

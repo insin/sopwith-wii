@@ -79,7 +79,7 @@ static  char     *expltune[7] = {
 };
 #endif
 
-BOOL titleflg;		        /* Playing title tune               */
+SWBOOL titleflg;		        /* Playing title tune               */
 static int titlplace;		/*  Place in title tune;            */
 static int titlline;		/* Line in title tune               */
 static unsigned titltone;	/*  Current title tone              */
@@ -251,7 +251,7 @@ void playnote()
 	static int noteoctavefactor;
 	static int dottednote;
 
-	BOOL firstplace = TRUE;
+	SWBOOL firstplace = TRUE;
 
 	indexadj = 0;
 	durplace = 0;
@@ -343,7 +343,7 @@ void playnote()
 	}
 #ifdef SOPWITH1_TUNE
 	tunedura = duration * 0.7;
-#else 
+#else
 	tunedura = duration;
 #endif
 }
@@ -619,7 +619,7 @@ void swsndupdate()
 // sdh 21/10/2001: rearranged headers, added cvs tags
 // sdh 21/10/2001: reformatted with indent. adjusted some code by hand
 //                 to make more readable
-// sdh 20/10/2001: added #define to use sopwith 1 theme (extracted from 
+// sdh 20/10/2001: added #define to use sopwith 1 theme (extracted from
 //                 hexdump of sopwith1.exe)
 // sdh 19/10/2001: removed externs (now in headers)
 //                 shuffled some functions round to shut up compiler
