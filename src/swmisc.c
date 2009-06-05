@@ -150,7 +150,10 @@ void swcolour(int a)
 void swposcur(int a, int b)
 {
 	cur_x = a;
-	cur_y = b;
+	// jb 05/06/2009: b values supplied by callers of this function seem to
+	// assume co-ordinates based on a 200px high screen - calculating this
+	// additional offset fixes alignment for taller screens
+	cur_y = b+((SCR_HGHT-200)/8);
 }
 
 int swgetc()

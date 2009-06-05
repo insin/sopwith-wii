@@ -36,7 +36,19 @@
 /*  Constants  */
 
 #define MAX_X           3000            /*  Maximum X coordinate            */
+
+#ifdef HW_RVL
+
+// Fill the screen on the Wii
+
+#define MAX_Y           240             /*  Maximum Y coordinate            */
+
+#else
+
 #define MAX_Y           200             /*  Maximum Y coordinate            */
+
+#endif
+
 #define MIN_SPEED       4               /*  Minimum plane speed             */
 #define MAX_SPEED       8               /*  Maximum plane speed             */
 #define MAX_THROTTLE    4               /*  Maximum acceleration            */
@@ -58,15 +70,7 @@
 
 #endif
 
-#ifdef HW_RVL
-
-#define SCR_HGHT        240             /*  Screen Height                   */
-
-#else
-
-#define SCR_HGHT        200             /*  Screen Height                   */
-
-#endif
+#define SCR_HGHT        MAX_Y           /*  Screen Height                   */
 
 #define SCR_CENTR       ((SCR_WDTH / 2) - 8) /*  Centre column of screen */
 #define SCR_SEGM        0xB800          /*  Screen Video segment            */
