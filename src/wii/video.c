@@ -360,9 +360,11 @@ static sopkey_t translate_button(int button)
 	switch (button) {
 	case REMOTE_PLUS:
 	case CLASSIC_R:
+	case CLASSIC_ZR:
 		return KEY_ACCEL;
 	case REMOTE_MINUS:
 	case CLASSIC_L:
+	case CLASSIC_ZL:
 		return KEY_DECEL;
 	case REMOTE_1:
 	case CLASSIC_B:
@@ -370,16 +372,12 @@ static sopkey_t translate_button(int button)
 	case REMOTE_2:
 	case CLASSIC_A:
 		return KEY_FIRE;
-	case CLASSIC_PLUS:
-		return KEY_HOME;
     case CLASSIC_Y:
 	case REMOTE_B:
 		return KEY_MISSILE;
 	case CLASSIC_X:
 	case REMOTE_A:
 		return KEY_STARBURST;
-	case CLASSIC_MINUS:
-		return KEY_SOUND;
 	default:
 		return KEY_UNKNOWN;
 	}
@@ -394,6 +392,8 @@ static sopkey_t translate_hat(int hat)
 		return KEY_PULLDOWN;
 	case SDL_HAT_DOWN:
 		return KEY_FLIP;
+	case SDL_HAT_UP:
+		return KEY_HOME;
 	default:
 		return KEY_UNKNOWN;
 	}

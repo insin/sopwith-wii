@@ -289,7 +289,7 @@ void setconfig()
 		swcolour(1);
 
 		swposcur(1, 22);
-		swputs("  Minus - Exit Menu");
+		swputs("  + - Exit Menu");
 
 		Vid_Update();
 
@@ -318,8 +318,8 @@ void setconfig()
 			if (selectedOption < num_confoptions - 1)
 				selectedOption = selectedOption + 1;
 			break;
-	    case REMOTE_MINUS:
-	    case CLASSIC_MINUS:
+	    case REMOTE_PLUS:
+	    case CLASSIC_PLUS:
 			return;
 	    default:
 	    	break;
