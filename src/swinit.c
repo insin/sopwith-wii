@@ -60,7 +60,7 @@ static SWBOOL ghost;		/* ghost display flag             */
 
 static char helptxt[] =
 "\n"
-"SDL Sopwith Wii\n"
+"SDL Sopwith " VERSION "\n"
 "Copyright (C) 1984-2000 David L. Clark\n"
 "Copyright (C) 2001 Simon Howard\n"
 "\n"
