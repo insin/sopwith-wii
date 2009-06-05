@@ -195,9 +195,9 @@ static SWBOOL getnet()
 {
 	for (;;) {
 		clrprmpt();
-		swputs("Key: L - listen for connection\n");
-		swputs("     C - connect to remote host\n");
-		swputs("     T - connect to TCP loop\n");
+		swputs("Key: A - listen for connection\n");
+		swputs("     B - connect to remote host\n");
+		swputs("     + - connect to TCP loop\n");
 
 		Vid_Update();
 
@@ -206,19 +206,23 @@ static SWBOOL getnet()
 		if (ctlbreak())
 			swend(NULL, NO);
 
-		switch (toupper(swgetc() & 0xff)) {
-		case 'L':
+		switch (swgetc()) {
+		case REMOTE_A:
+		case CLASSIC_A:
 			asynmode = ASYN_LISTEN;
 			return 1;
-		case 'C':
+		case REMOTE_B:
+		case CLASSIC_B:
 			asynmode = ASYN_CONNECT;
 			gethost();
 			return 1;
-		case 'T':
+		case REMOTE_PLUS:
+		case CLASSIC_PLUS:
 			asynmode = ASYN_TCPLOOP;
 			gethost();
 			return 1;
-		case 27:
+		case REMOTE_HOME:
+		case CLASSIC_HOME:
 			return 0;
 		}
 	}
@@ -327,7 +331,7 @@ void getgamemode()
 		swputs("Key: A - single player\r\n");
 		swputs("     B - single player against computer\r\n");
 #ifdef TCPIP
-		swputs("     N - network game\r\n");
+		swputs("     - - network game\r\n");
 #endif
 		swputs("     + - game options\r\n");
 		Vid_Update();
@@ -352,7 +356,8 @@ void getgamemode()
 			playmode = PLAYMODE_COMPUTER;
 			return;
 #ifdef TCPIP
-		case 'N':
+		case REMOTE_MINUS:
+		case CLASSIC_MINUS:
 			if (getnet()) {
 				playmode = PLAYMODE_ASYNCH;
 				return;
