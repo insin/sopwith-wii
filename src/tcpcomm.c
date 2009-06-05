@@ -34,10 +34,14 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#ifdef HW_RVL
+#include <network.h>
+#else
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#endif
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
@@ -73,10 +77,10 @@ void commconnect(char *host)
 			realhost = host;
 		}
 	}
-       
+
 	// resolve name
 
-	hent = gethostbyname(realhost);
+	hent = net_gethostbyname(realhost);
 
 	if (realhost != host)
 		free(realhost);
@@ -89,7 +93,7 @@ void commconnect(char *host)
 	}
 	// create socket
 
-	tcp_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	tcp_sock = net_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (tcp_sock < -1) {
 		fprintf(stderr,
@@ -104,7 +108,7 @@ void commconnect(char *host)
 	in.sin_addr.s_addr = ((struct in_addr *) hent->h_addr)->s_addr;
 	in.sin_port = htons(port);
 
-	if (connect(tcp_sock, (struct sockaddr *) &in, sizeof(in)) < 0) {
+	if (net_connect(tcp_sock, (struct sockaddr *) &in, sizeof(in)) < 0) {
 		fprintf(stderr,
 			"commconnect: cant connect to '%s': %s\n",
 			host, strerror(errno));
@@ -128,7 +132,7 @@ void commlisten()
 
 	// create socket
 
-	server_sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	server_sock = net_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (server_sock < 0) {
 		fprintf(stderr,
@@ -143,7 +147,7 @@ void commlisten()
 	in.sin_addr.s_addr = INADDR_ANY;
 	in.sin_port = htons(PORT);
 
-	if (bind(server_sock, (struct sockaddr *) &in, sizeof(in)) < 0) {
+	if (net_bind(server_sock, (struct sockaddr *) &in, sizeof(in)) < 0) {
 		fprintf(stderr,
 			"commlisten: cant bind to port %i: %s\n",
 			PORT, strerror(errno));
@@ -154,7 +158,7 @@ void commlisten()
 
 	// listen for connections
 
-	if (listen(server_sock, 1)) {
+	if (net_listen(server_sock, 1)) {
 		fprintf(stderr,
 			"commlisten: cant listen on port %i: %s\n",
 			PORT, strerror(errno));
@@ -164,21 +168,21 @@ void commlisten()
 	fprintf(stderr,
 		"commlisten: listening for connection on port %i\n", PORT);
 
-		
+
 	fcntl(server_sock, F_SETFL, O_NONBLOCK);
-	
+
 	// listen for connection
 
 	for (;;) {
 		if (ctlbreak()) {
-			fprintf(stderr, 
+			fprintf(stderr,
 				"commlisten: user aborted connect\n");
 			exit(-1);
 		}
 
 		in_size = sizeof(in);
-		
-		tcp_sock = accept(server_sock, (struct sockaddr *) &in, &in_size);
+
+		tcp_sock = net_accept(server_sock, (struct sockaddr *) &in, &in_size);
 
 		if (tcp_sock >= 0) {
 			break;
@@ -195,7 +199,7 @@ void commlisten()
 	}
 
 	// non blocking socket
-	
+
 	fcntl(tcp_sock, F_SETFL, O_NONBLOCK);
 
 	fprintf(stderr,
@@ -219,7 +223,7 @@ int commin()
 
 	// read
 
-	bytes = read(tcp_sock, &c, 1);
+	bytes = net_read(tcp_sock, &c, 1);
 
 	if (bytes < 1) {
 		if (errno != EWOULDBLOCK) {
@@ -260,12 +264,12 @@ void commterm()
 {
 #ifdef TCPIP
 	if (tcp_sock > 0) {
-		close(tcp_sock);
+		net_close(tcp_sock);
 		tcp_sock = -1;
 	}
 
 	if (server_sock > 0) {
-		close(server_sock);
+		net_close(server_sock);
 		server_sock = -1;
 	}
 #endif      /* #ifdef TCPIP */
