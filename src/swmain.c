@@ -47,7 +47,7 @@ SWBOOL conf_solidground = 0;          // draw ground solid like in sopwith 1
 SWBOOL conf_hudsplats = 1;            // splatted birds etc
 SWBOOL conf_wounded = 1;              // enable wounded planes
 SWBOOL conf_animals = 1;              // birds and oxes
-SWBOOL conf_harrykeys = 0;            // plane rotation relative to screen
+SWBOOL conf_harrykeys = 1;            // plane rotation relative to screen
 
 playmode_t playmode;		/* Mode of play                     */
 GAMES *currgame;		/* Game parameters and current game */
